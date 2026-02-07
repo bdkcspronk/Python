@@ -1,3 +1,4 @@
+import shutil
 import tkinter as tk
 from tkinter import ttk
 import multiprocessing
@@ -16,6 +17,9 @@ progress_var = None
 plot_energy_btn = None
 plot_mag_btn = None
 root = None
+
+viz_process = None
+viz_tmp_dirs = []
 
 temp_widgets = []
 temps = []
@@ -107,6 +111,20 @@ def get_snapshot_keys(file_path):
 # ------------------------
 def visualize_snapshots(file_path, key):
     import tempfile, numpy as np, os
+
+    global viz_process, viz_tmp_dirs
+
+    # Keep a single visualizer process alive at a time to avoid pygame/OpenGL crashes
+    if viz_process is not None and viz_process.is_alive():
+        viz_process.terminate()
+        viz_process.join(timeout=2)
+
+    for tmp_dir in viz_tmp_dirs:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+    viz_tmp_dirs.clear()
+
+
+
     data = np.load(file_path, allow_pickle=True)
 
     # Extract only the snapshots for this key
@@ -118,6 +136,7 @@ def visualize_snapshots(file_path, key):
     # Save temp .npz file
     tmp_dir = tempfile.mkdtemp()
     tmp_file = os.path.join(tmp_dir, "snapshots.npz")
+    viz_tmp_dirs.append(tmp_dir)
     save_dict = {'snapshots': snaps}
     # copy metadata
     for k in data.files:
@@ -126,11 +145,12 @@ def visualize_snapshots(file_path, key):
     np.savez_compressed(tmp_file, **save_dict)
 
     # Launch viz directly (no subprocess, better for executable builds)
-    threading.Thread(
+    viz_process = multiprocessing.Process(
         target=ising_viz.run_visualizer,
         args=(tmp_dir,),
         daemon=True
     ).start()
+    viz_process.start()
 
 def build_viz_buttons(file_path, parent_frame):
     # Clear only previous buttons, keep label(s)
