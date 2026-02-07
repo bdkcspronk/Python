@@ -3,9 +3,6 @@ from tkinter import ttk
 import threading
 import subprocess
 import os
-
-import tkinter.filedialog as filedialog
-import matplotlib.pyplot as plt
 import ising_plots as plots
 
 # ------------------------
