@@ -150,7 +150,6 @@ def visualize_snapshots(file_path, key):
         args=(tmp_dir,),
         daemon=True
     ).start()
-    viz_process.start()
 
 def build_viz_buttons(file_path, parent_frame):
     # Clear only previous buttons, keep label(s)
