@@ -8,10 +8,8 @@ import threading
 from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED, CancelledError
 from ising_initialization import ensure_open_dir
 
-
 _stop_requested_event = threading.Event()
 _current_mp_stop_event = None
-
 
 def request_stop():
     global _current_mp_stop_event
@@ -28,9 +26,6 @@ def clear_stop_request():
 
 def is_stop_requested():
     return _stop_requested_event.is_set()
-
-
-
 
 # ================================
 # ISING MODEL
@@ -99,8 +94,8 @@ class IsingModel3D:
 def run_temp(T, args, stop_event=None):
     model = IsingModel3D(args.H, args.W, args.L, start_T=T, target_T=args.target_T,
                          dT=args.dT, steps_dT=args.steps_dT, j_coupling=args.J, external_field=args.B)
-    total_steps = int(args.steps * (1 + args.relax_perc / 100.0))
-    relax_steps = total_steps - args.steps
+    total_steps = args.steps
+    relax_steps = int(total_steps * args.relax_perc / 100.0)
     snapshots = []
 
     for step in range(1, total_steps + 1):
@@ -112,15 +107,16 @@ def run_temp(T, args, stop_event=None):
         if stop_event is not None and stop_event.is_set():
             break
 
-        if step > relax_steps:
-            if args.dT != 0.0 and model.temperature != model.target_T and args.steps_dT > 0 and step % args.steps_dT == 0:
+        if args.dT != 0.0 and model.temperature != model.target_T and args.steps_dT > 0 and step % args.steps_dT == 0:
                 model.temperature += args.dT
                 if (args.dT > 0 and model.temperature > args.target_T) or (args.dT < 0 and model.temperature < args.target_T):
                     model.temperature = args.target_T
 
+        if step > relax_steps:
+
             if step % args.save == 0:
                 snapshot = {
-                    "step": step - relax_steps,
+                    "step": step,
                     "spins": model.spins.copy(),
                     "energy": model.energy,
                     "magnetization": model.magnetization,
@@ -136,7 +132,6 @@ def run_temp(T, args, stop_event=None):
                         break
 
                 if args.stop_fully_mag == "ON" and abs(model.magnetization) >= args.fully_mag_limit:
-                    stop_sim = True
                     print(f"T={T:.4f} stopped early: fully magnetized (|M| >= {args.fully_mag_limit}).")
                     break
 

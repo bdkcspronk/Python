@@ -5,7 +5,6 @@ import seaborn as sns
 import os
 from ising_initialization import resolve_snapshot_file
 
-
 sns.set_style("whitegrid")
 
 # ------------------------
@@ -74,7 +73,6 @@ def plot_energy_time(file_path):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-
 
 def plot_mag_time(file_path):
     all_snapshots, _ = load_snapshots(file_path)

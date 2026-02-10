@@ -390,8 +390,6 @@ class IsingVisualizer3D:
 
         pygame.display.flip()
 
-
-
 def load_snapshots(open_dir):
     data = np.load(os.path.join(open_dir, "snapshots.npz"), allow_pickle=True)
 

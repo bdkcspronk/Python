@@ -451,9 +451,9 @@ def build_gui():
     temp_range_explainer = (
         "Optional multi-temperature run:\n"
         "- Enable to run simulations at multiple temperatures.\n"
-        "- This overrides the single start/target temperature if enabled.\n"
+        "- This overrides the single start temperature if enabled.\n"
         "- Number of Temperatures specifies how many temperatures to sample between Min and Max Temperature.\n"
-        "- NOTE: ΔT and ΔT steps settings still apply within each temperature."
+        "- NOTE: Target temperature, ΔT, and ΔT steps settings still apply within each temperature."
     )
 
     add_group_frame(
