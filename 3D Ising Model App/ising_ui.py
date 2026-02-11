@@ -1,4 +1,3 @@
-from ttkthemes import ThemedTk
 import tkinter as tk
 from tkinter import ttk
 import tkinter.font as tkfont
@@ -860,22 +859,10 @@ def add_group_frame(parent, title, explanation, settings):
 def build_gui():
     global progress_var, run_var, viz_buttons_frame, plot_energy_btn, plot_mag_btn, plot_thermo_btn, sim_entries, root
     global runs_status_var, runs_tree, thermo_status_var, checkbox_images
-    is_windows = sys.platform.startswith("win")
-    if ThemedTk is not None and not is_windows:
-        root = ThemedTk(theme="yaru")
-    else:
-        root = tk.Tk()
+
     root.title("3D Ising Model Simulation")
 
     style = ttk.Style(root)
-    if is_windows or ThemedTk is None:
-        # Prefer native Windows themes for performance.
-        for theme in ("vista", "xpnative", "clam"):
-            try:
-                style.theme_use(theme)
-                break
-            except tk.TclError:
-                continue
 
     # --- Minimal dark theme pass (native theme + light styling) ---
     base_font = ("Bahnschrift", 10)
@@ -884,12 +871,11 @@ def build_gui():
 
     colors = UI_COLORS
 
-    if is_windows:
-        # Clam respects custom colors for notebook tabs and frames on Windows.
-        try:
-            style.theme_use("clam")
-        except tk.TclError:
-            pass
+    # Clam respects custom colors for notebook tabs and frames on Windows.
+    try:
+        style.theme_use("clam")
+    except tk.TclError:
+        pass
 
     root.configure(bg=colors["panel"])
     checkbox_images = _build_checkbox_images(root, size=24)
@@ -955,24 +941,6 @@ def build_gui():
     style.map("TEntry", fieldbackground=[("disabled", colors["entry_bg"])])
     style.configure("TProgressbar", background=colors["accent"], troughcolor=colors["progress_trough"], bordercolor=colors["border"])
 
-    def enable_dark_titlebar(window):
-        if not is_windows:
-            return
-        try:
-            hwnd = window.winfo_id()
-            value = ctypes.c_int(1)
-            # Try newer (20) then older (19) immersive dark mode attribute.
-            for attr in (20, 19):
-                ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                    hwnd,
-                    attr,
-                    ctypes.byref(value),
-                    ctypes.sizeof(value),
-                )
-        except Exception:
-            pass
-
-    enable_dark_titlebar(root)
     root.geometry("900x1100")  # pick a size you like
     root.update_idletasks()
     x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
