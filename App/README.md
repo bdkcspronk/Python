@@ -1,0 +1,29 @@
+# Computational Physics
+
+Collection of python scripts and applications related to computational physics.  
+Contains simulations and analysis tools for physical models (e.g., 3D Ising model).
+
+## Running the Application (Prebuilt Executable)
+
+A standalone executable is provided.
+
+No Python installation is required.
+
+1. Download the `.exe` file from the repository (or Releases section).
+2. Double-click to run.
+
+Note:
+- Windows SmartScreen may show a warning the first time.
+- The executable was built using PyInstaller (`--onefile`).
+
+## Running from Source
+
+If you want to modify or run the code directly:
+
+### Requirements
+- Python 3.x
+- numpy
+- matplotlib
+- seaborn
+- pygame
+- OpenGL (PyOpenGL)
